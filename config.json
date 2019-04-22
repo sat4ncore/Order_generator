@@ -1,0 +1,48 @@
+{
+  "Generator": {
+    "volume": 2000,
+    "chunk_size": 100,
+    "red_zone": 15,
+    "green_zone": 60,
+    "blue_zone": 25,
+    "identifier_bit_depth": 20,
+    "currency_pairs": [
+      "EUR/USD",
+      "USD/RUB",
+      "EUR/RUB",
+      "GBP/USD",
+      "AUD/USD",
+      "USD/JPY",
+      "NZD/USD",
+      "USD/CAD"
+    ]
+  },
+  "Logger": {
+    "version": 1,
+    "handlers": {
+      "fileHandler": {
+        "class": "logging.FileHandler",
+        "formatter": "myFormatter",
+        "filename": "log.txt"
+      },
+      "consoleHandler": {
+        "class": "logging.StreamHandler",
+        "formatter": "myFormatter",
+        "level": "INFO"
+      }
+    },
+    "loggers": {
+      "program": {
+        "handlers": [
+          "consoleHandler", "fileHandler"
+        ],
+        "level": "INFO"
+      }
+    },
+    "formatters": {
+      "myFormatter": {
+        "format": "%(asctime)s - [%(name)s - %(levelname)s] - %(message)s"
+      }
+    }
+  }
+}

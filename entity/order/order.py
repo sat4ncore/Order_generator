@@ -14,4 +14,3 @@ class Order:
     filled_volume: float
     description: str
     tags: str
-

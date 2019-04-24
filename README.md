@@ -18,10 +18,12 @@ Order generator is a program that generates input data for some financial proces
 | Direction         | Selected operation. Can be **buy** or **sell**                                    |
 | Status            | The status of the order at the specified time                                     |
 | Date              | Date in which the order was in a certain status                                   |
-| Initial price     | Starting price of the currency ratio                                              |
-| Filled price      | Current price of the currency ratio. May differ from the initial price by +/- 5%  |
+| Initial price     | Starting price of a currency pair                                                 |
+| Filled price      | Price of the currency pair at the end of the order.                               |
+|                   | May differ from the initial price by +/- 5%                                       |
 | Initial volume    | Amount of currency that interests the trader                                      |
-| Filled volume     | Amount of currency that the trader has received at the current time               |
+| Filled volume     | Amount of currency that the trader                                                |
+|                   | has received at the end of the order.                                             |
 | Description       | A note left by the trader when creating an order                                  |
 | Tags              | A few single words regarding the order                                            |
 
@@ -46,7 +48,7 @@ See the [Python](python.org) page for actual information.
 To work with RabbitMQ and MySQL, you must also install additional Python modules using the command: 
 
 ```bash
-pip install requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 ##### RabbitMQ

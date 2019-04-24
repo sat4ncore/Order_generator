@@ -1,3 +1,7 @@
+import config.constant.util.color as color
+import random
+
+
 class LoggerConsts:
-    DEFAULT_FORMAT = "%(asctime)s - [%(name)s - %(levelname)s] - %(message)s"
+    DEFAULT_FORMAT = f"{random.choice(color.Colors.COLORS)}{color.Colors.BOLD}%(message)s"
     MAIN_MODULE = "program"

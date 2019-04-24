@@ -1,4 +1,3 @@
-
 class Modes:
     READ = "r"
     WRITE = "w"

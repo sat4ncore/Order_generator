@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package mapping;
+
+message Order{
+    required string identifier = 1;
+    required string currency_pair = 2;
+    required string direction = 3;
+    required string status = 4;
+    required int64 timestamp = 5;
+    required float initial_price = 6;
+    required float filled_price = 8;
+    required float initial_volume = 7;
+    required float filled_volume = 9;
+    required string description = 10;
+    required string tags = 11;
+}
+

@@ -1,4 +1,4 @@
-class LogLevels:
+class LogLevel:
     INFO = "INFO"
     DEBUG = "DEBUG"
     WARNING = "WARNING"

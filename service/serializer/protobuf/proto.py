@@ -34,6 +34,6 @@ class ProtoSerializer:
                              proto_order.initial_volume,
                              proto_order.filled_volume,
                              proto_order.description,
-                             proto_order.tag)
+                             proto_order.tags)
         return order
 

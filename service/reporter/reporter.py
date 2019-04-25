@@ -31,17 +31,19 @@ class Reporter:
 
     @classmethod
     def increment_received(cls, func):
-        def generation_wrapper(self):
+        def rmq_wrapper(*args):
+            result = func(*args)
             cls.__received_from_rmq += 1
-            return func(self)
-        return generation_wrapper
+            return result
+        return rmq_wrapper
 
     @classmethod
     def increment_saved(cls, func):
-        def generation_wrapper(self):
+        def mysql_wrapper(*args):
+            result = func(*args)
             cls.__saved_to_database += 1
-            return func(self)
-        return generation_wrapper
+            return result
+        return mysql_wrapper
 
     @classmethod
     def report(cls):
@@ -57,3 +59,11 @@ RabbitMQ:
 MySQL:
     saved  --  {cls.__saved_to_database}
                                     """)
+
+storage = []
+
+def store(func):
+    def wrapper(*args):
+        storage.append(func(*args))
+
+    return wrapper

@@ -1,10 +1,10 @@
 from launcher.launcher import Launcher
-import sys
 
 
 class Program:
     @staticmethod
     def main():
+
         Launcher.launch()
 
 

@@ -29,6 +29,7 @@ class OrderBuilder:
             identifier = random.randrange(10 ** (self.identifier_bit_depth - 1), 10 ** self.identifier_bit_depth)
             if identifier not in self.unique_identifiers:
                 exists = False
+        identifier = str(identifier)
         currency_pair = random.choice(self.currency_pairs)
         direction = random.choice(const.GeneratorConsts.DIRECTIONS)
         timestamp = self.initial_timestamp + random.randrange(const.GeneratorConsts.WEEK_TIMESTAMP)

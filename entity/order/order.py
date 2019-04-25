@@ -14,3 +14,7 @@ class Order:
     filled_volume: float
     description: str
     tags: str
+
+    def __iter__(self):
+        for field in self.__dict__.values():
+            yield field

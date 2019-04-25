@@ -17,7 +17,7 @@ class RMQService:
 
     def queue_declare(self, queue, passive=False, durable=False, exclusive=False, auto_delete=False):
         try:
-            self._channel.queue_declare(queue, passive, durable, exclusive, auto_delete)
+            return self._channel.queue_declare(queue, passive, durable, exclusive, auto_delete)
         except exceptions.AMQPChannelError:
             logger.Logger.error(f"Cannot declare queue {queue}")
 

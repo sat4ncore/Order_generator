@@ -3,7 +3,7 @@
     "host": "localhost",
     "port": 3306,
     "user": "root",
-    "password": "admin",
+    "password": "15012000",
     "database": "simcord"
   },
   "RabbitMQ": {
@@ -19,7 +19,7 @@
     "exchange_type": "topic"
   },
   "Generator": {
-    "volume": 2000,
+    "volume": 10000,
     "chunk_size": 100,
     "red_zone": 15,
     "green_zone": 60,
@@ -77,13 +77,13 @@
       "consoleHandler": {
         "class": "logging.StreamHandler",
         "formatter": "consoleFormatter",
-        "level": "INFO"
+        "level": "DEBUG"
       }
     },
     "loggers": {
       "program": {
         "handlers": [
-          "consoleHandler"
+          "consoleHandler", "fileHandler"
         ],
         "level": "INFO"
       }

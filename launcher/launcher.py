@@ -1,30 +1,16 @@
-import generator.generator as gen
-import service.file.json.service as file
-import config.mapper.mapper as mapper
-import service.reporter.reporter as reporter
-import util.logger.logger as logger
-import service.rmq.connection.connection as rmq
-import config.mapper.rmq.mapper as rmqm
-import service.rmq.service.service as rmqs
-import config.constant.generator.const as genc
-import service.rmq.publisher.publisher as rmqp
-import service.rmq.consumer.consumer as rmqc
-import service.serializer.protobuf.proto as serializer
-import util.storage.storage as store
-import service.my_sql.service.service as mysqls
-import threading
-import service.file.text.service as text
-import config.constant.my_sql.const as mysqlc
+import argparse
 
 
 class Launcher:
     @classmethod
     def launch(cls):
-        generator, publisher, consumer, mysql_service = cls._initialize()
-        cls._execute(generator, publisher, consumer, mysql_service)
+        pass
+        #generator, publisher, consumer, mysql_service = cls._initialize()
+        #cls._execute(generator, publisher, consumer, mysql_service)
 
     @classmethod
     def _initialize(cls):
+        """
         config = mapper.ConfigMapper(**file.JsonFileService.read("config.json"))
         logger.Logger(config.Logger)
         logger.Logger.info(f"Configuration loaded from file {'config.json'}")
@@ -80,4 +66,4 @@ class Launcher:
     @classmethod
     def _free(cls):
         pass
-
+        """

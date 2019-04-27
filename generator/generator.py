@@ -1,39 +1,43 @@
-import generator.builder.builder as builder
-import service.reporter.reporter as reporter
-import util.logger.logger as logger
+from config.constant.module import ModuleName
+from util.reporter import Reporter
+import logging
 import random
+
+LOGGER = logging.getLogger(ModuleName.GENERATOR)
 
 
 class OrderGenerator:
-    def __init__(self, volume, chunk_size, red_zone, green_zone, blue_zone, generation):
-        logger.Logger.info("Generator configuration...")
-        self.__volume = volume
-        self.__chunk_size = chunk_size
-        self.__red_zone = red_zone * volume // 100
-        self.__green_zone = green_zone * volume // 100
-        self.__blue_zone = blue_zone * volume // 100
-        self.__builder = builder.OrderBuilder(**generation)
+    def __init__(self, volume, chunk_size, red_zone, green_zone, blue_zone, builder):
+        LOGGER.info("Generator configuration...")
+        self._volume = volume
+        self._chunk_size = chunk_size
+        self._red_zone = self._calculate_zone(red_zone)
+        self._green_zone = self._calculate_zone(green_zone)
+        self._blue_zone = self._calculate_zone(blue_zone)
+        self._builder = builder
 
-    @reporter.Reporter.increment_red_zone
-    def __generate_red_zone(self):
+    def _calculate_zone(self, zone):
+        return zone * self._volume // 100
+
+    @Reporter.update_statistics
+    def _generate_red_zone(self):
         orders = []
-        build = self.__builder.build()
+        build = self._builder.build()
         for _ in range(random.randint(1, 2)):
             orders.append(next(build))
         return orders
 
-    @reporter.Reporter.increment_green_zone
-    def __generate_green_zone(self):
+    @Reporter.update_statistics
+    def _generate_green_zone(self):
         orders = []
-        build = self.__builder.build()
-        for _ in range(3):
-            orders.append(next(build))
+        for record in self._builder.build():
+            orders.append(next(record))
         return orders
 
-    @reporter.Reporter.increment_blue_zone
-    def __generate_blue_zone(self):
+    @Reporter.update_statistics
+    def _generate_blue_zone(self):
         orders = []
-        build = self.__builder.build()
+        build = self._builder.build()
         next(build)
         for _ in range(random.randint(1, 2)):
             orders.append(next(build))
@@ -41,18 +45,18 @@ class OrderGenerator:
 
     def generate(self) -> list:
         order_record = None
-        if self.__red_zone > 0:
-            order_record = self.__generate_red_zone()
-            self.__red_zone -= 1
-        elif self.__green_zone > 0:
-            order_record = self.__generate_green_zone()
-            self.__green_zone -= 1
-        elif self.__blue_zone > 0:
-            order_record = self.__generate_blue_zone()
-            self.__blue_zone -= 1
+        if self._red_zone > 0:
+            order_record = self._generate_red_zone()
+            self._red_zone -= 1
+        elif self._green_zone > 0:
+            order_record = self._generate_green_zone()
+            self._green_zone -= 1
+        elif self._blue_zone > 0:
+            order_record = self._generate_blue_zone()
+            self._blue_zone -= 1
         return order_record
 
     def generate_many(self):
-        logger.Logger.debug(f"Generation of a chunk with a size {self.__chunk_size}...")
-        for _ in range(self.__chunk_size):
+        LOGGER.debug(f"Generation of a chunk with a size {self._chunk_size}...")
+        for _ in range(self._chunk_size):
             yield self.generate()

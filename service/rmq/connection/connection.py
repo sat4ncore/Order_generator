@@ -1,7 +1,7 @@
 import pika
 import pika.exceptions as exceptions
 import util.logger.logger as logger
-import config.constant.exit.code as code
+import config.constant.exit_code as code
 import time
 
 

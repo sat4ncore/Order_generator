@@ -1,10 +1,10 @@
-import generator.order as native
-import util.serializer.protobuf.entity.order.order_pb2 as proto
+from generator.order import OrderTuple
+import util.serializer.protobuf.order_pb2 as proto
 
 
-class ProtoSerializer:
+class ProtobufSerializer:
     @classmethod
-    def serialize(cls, order: native.Order):
+    def serialize(cls, order: OrderTuple):
         proto_order = proto.Order()
         proto_order.identifier = order.identifier
         proto_order.currency_pair = order.currency_pair
@@ -24,16 +24,16 @@ class ProtoSerializer:
     def deserialize(cls, order):
         proto_order = proto.Order()
         proto_order.ParseFromString(order)
-        order = native.Order(proto_order.identifier,
-                             proto_order.currency_pair,
-                             proto_order.direction,
-                             proto_order.status,
-                             proto_order.timestamp,
-                             proto_order.initial_price,
-                             proto_order.filled_price,
-                             proto_order.initial_volume,
-                             proto_order.filled_volume,
-                             proto_order.description,
-                             proto_order.tags)
+        order = OrderTuple(proto_order.identifier,
+                           proto_order.currency_pair,
+                           proto_order.direction,
+                           proto_order.status,
+                           proto_order.timestamp,
+                           proto_order.initial_price,
+                           proto_order.filled_price,
+                           proto_order.initial_volume,
+                           proto_order.filled_volume,
+                           proto_order.description,
+                           proto_order.tags)
         return order
 

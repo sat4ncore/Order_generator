@@ -1,4 +1,4 @@
-from config.constant.file_mode import READ
+from config.constant.file_mode import FileMode
 import logging
 
 LOGGER = logging.getLogger(__name__)
@@ -9,7 +9,7 @@ class TextFileService:
     def read_all(cls, handle):
         if isinstance(handle, str):
             try:
-                with open(handle, READ) as file:
+                with open(handle, FileMode.READ) as file:
                     return file.read()
             except IOError as ex:
                 LOGGER.error(ex)
@@ -18,7 +18,7 @@ class TextFileService:
     def read_lines(cls, handle):
         if isinstance(handle, str):
             try:
-                with open(handle, READ) as file:
+                with open(handle, FileMode.READ) as file:
                     return file.readlines()
             except IOError as ex:
                 LOGGER.error(ex)

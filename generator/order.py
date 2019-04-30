@@ -25,4 +25,3 @@ Solving an insert problem without a builder architecture change
 """
 OrderTuple = namedtuple("OrderTuple", "identifier currency_pair direction status timestamp initial_price "
                                       "filled_price initial_volume filled_volume description tags")
-

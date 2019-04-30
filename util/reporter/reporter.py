@@ -1,8 +1,8 @@
 from config.constant.reporter import ReportConstant
-from config.constant.module import ModuleName
+from config.constant.module import Module
 import logging
 
-LOGGER = logging.getLogger(ModuleName.REPORTER)
+LOGGER = logging.getLogger(Module.REPORTER)
 
 
 class Reporter:

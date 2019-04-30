@@ -1,19 +1,12 @@
 from generator.order import OrderTuple as Order
-from config.constant.order import STATUS_NEW, \
-    STATUS_TO_PROVIDER, \
-    STATUS_FILLED, \
-    STATUS_PARTIAL_FILLED, \
-    STATUS_REJECT, \
-    DIRECTIONS, \
-    WEEK_TIMESTAMP, \
-    FINAL_STATUSES
-from config.constant.module import BUILDER
+from config.constant.order import Status, WEEK_TIMESTAMP, DIRECTIONS
+from config.constant.module import Module
 from dataclasses import dataclass, field
 import logging
 import random
 import time
 
-LOGGER = logging.getLogger(BUILDER)
+LOGGER = logging.getLogger(Module.BUILDER)
 
 
 @dataclass(frozen=True)
@@ -52,26 +45,26 @@ class OrderBuilder:
         description = random.choice(self.descriptions)
         tags = ", ".join(random.sample(self.tags, random.randint(1, self.tags_in_order)))
 
-        yield Order(identifier, currency_pair, direction, STATUS_NEW,
+        yield Order(identifier, currency_pair, direction, Status.NEW,
                     timestamp, initial_price, 0, initial_volume, 0., description, tags)
 
         timestamp += random.randint(1000, 5000)
 
-        yield Order(identifier, currency_pair, direction, STATUS_TO_PROVIDER,
+        yield Order(identifier, currency_pair, direction, Status.TO_PROVIDER,
                     timestamp, initial_price, 0., initial_volume, 0., description, tags)
 
         timestamp += random.randint(1000, 5000)
 
-        status = random.choice(FINAL_STATUSES)
+        status = random.choice(Status.FINALS)
 
         percent = random.uniform(0.95, 1.05)
         final_order = {
-            STATUS_REJECT: Order(identifier, currency_pair, direction, status, timestamp,
+            Status.REJECT: Order(identifier, currency_pair, direction, status, timestamp,
                                  initial_price, 0., initial_volume, 0., description, tags),
-            STATUS_FILLED: Order(identifier, currency_pair, direction, status, timestamp,
+            Status.FILLED: Order(identifier, currency_pair, direction, status, timestamp,
                                  initial_price, initial_price, initial_volume,
                                  initial_volume, description, tags),
-            STATUS_PARTIAL_FILLED: Order(identifier, currency_pair, direction, status,
+            Status.PARTIAL_FILLED: Order(identifier, currency_pair, direction, status,
                                          timestamp, initial_price,
                                          round(initial_price * percent, 5),
                                          initial_volume, round(initial_volume * percent, 8),

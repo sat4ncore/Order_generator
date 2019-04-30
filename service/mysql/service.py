@@ -1,10 +1,10 @@
-from config.constant.exit_code import ExitCode
-from config.constant.module import ModuleName
+from config.constant.exit_code import MYSQL
+from config.constant.module import MySQLModule
 from util.reporter.reporter import Reporter
 import mysql.connector
 import logging
 
-LOGGER = logging.getLogger(ModuleName.MYSQL_SERVICE)
+LOGGER = logging.getLogger(MySQLModule.SERVICE)
 
 
 class MySQLService:
@@ -28,7 +28,7 @@ class MySQLService:
             return True
         except mysql.connector.DatabaseError as ex:
             LOGGER.fatal(ex)
-            exit(ExitCode.MYSQL)
+            exit(MYSQL)
 
     def _close(self):
         self._connection.close()
@@ -72,7 +72,7 @@ class MySQLService:
             if self._reconnect():
                 return self._execute(operation, params, multi)
             else:
-                exit(ExitCode.MYSQL)
+                exit(MYSQL)
 
     @Reporter.update_insertion
     def _execute_many(self, operation, seq_params):
@@ -91,5 +91,4 @@ class MySQLService:
             if self._reconnect():
                 return self._execute_many(operation, seq_params)
             else:
-                exit(ExitCode.MYSQL)
-
+                exit(MYSQL)

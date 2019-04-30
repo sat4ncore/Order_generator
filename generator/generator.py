@@ -1,11 +1,11 @@
 from config.constant.exit_code import GENERATOR as GENERATOR_EXIT
-from config.constant.module import GENERATOR
+from config.constant.module import Module
 from util.reporter.reporter import Reporter
 from generator.builder import OrderBuilder
 import logging
 import random
 
-LOGGER = logging.getLogger(GENERATOR)
+LOGGER = logging.getLogger(Module.GENERATOR)
 
 
 class OrderGenerator:

@@ -1,7 +1,7 @@
 import pika.exceptions
 import pika.channel
 import util.serializer.protobuf.serializer as deserializer
-import service.rmq.connection.connection as rmq
+from service.rmq import service as rmq
 import util.logger.logger as logger
 import config.constant.builder as genc
 import util.reporter.reporter as reporter

@@ -1,12 +1,19 @@
 from generator.order import OrderTuple as Order
-from config.constant.order import OrderConstant
-from config.constant.module import ModuleName
+from config.constant.order import STATUS_NEW, \
+    STATUS_TO_PROVIDER, \
+    STATUS_FILLED, \
+    STATUS_PARTIAL_FILLED, \
+    STATUS_REJECT, \
+    DIRECTIONS, \
+    WEEK_TIMESTAMP, \
+    FINAL_STATUSES
+from config.constant.module import BUILDER
 from dataclasses import dataclass, field
 import logging
 import random
 import time
 
-LOGGER = logging.getLogger(ModuleName.BUILDER)
+LOGGER = logging.getLogger(BUILDER)
 
 
 @dataclass(frozen=True)
@@ -26,6 +33,7 @@ class OrderBuilder:
         random.seed(self.random_seed)
         self.currency_prices.update(zip(self.currency_pairs,
                                         [round(random.uniform(0, 100), 5) for _ in self.currency_pairs]))
+        LOGGER.info("Configuration complete")
 
     def build(self):
         identifier = 0
@@ -36,38 +44,38 @@ class OrderBuilder:
                 exists = False
         identifier = str(identifier)
         currency_pair = random.choice(self.currency_pairs)
-        direction = random.choice(OrderConstant.DIRECTIONS)
-        timestamp = self.initial_timestamp + random.randrange(OrderConstant.WEEK_TIMESTAMP)
+        direction = random.choice(DIRECTIONS)
+        timestamp = self.initial_timestamp + random.randrange(WEEK_TIMESTAMP)
         timestamp += random.randint(1000, 5000)
         initial_price = self.currency_prices[currency_pair]
         initial_volume = round(random.random() * 10 ** 5, 8)
         description = random.choice(self.descriptions)
         tags = ", ".join(random.sample(self.tags, random.randint(1, self.tags_in_order)))
 
-        yield Order(identifier, currency_pair, direction, OrderConstant.STATUS_NEW,
+        yield Order(identifier, currency_pair, direction, STATUS_NEW,
                     timestamp, initial_price, 0, initial_volume, 0., description, tags)
 
         timestamp += random.randint(1000, 5000)
 
-        yield Order(identifier, currency_pair, direction, OrderConstant.STATUS_TO_PROVIDER,
+        yield Order(identifier, currency_pair, direction, STATUS_TO_PROVIDER,
                     timestamp, initial_price, 0., initial_volume, 0., description, tags)
 
         timestamp += random.randint(1000, 5000)
 
-        status = random.choice(OrderConstant.FINAL_STATUSES)
+        status = random.choice(FINAL_STATUSES)
 
         percent = random.uniform(0.95, 1.05)
         final_order = {
-            OrderConstant.STATUS_REJECT: Order(identifier, currency_pair, direction, status, timestamp,
-                                               initial_price, 0., initial_volume, 0., description, tags),
-            OrderConstant.STATUS_FILLED: Order(identifier, currency_pair, direction, status, timestamp,
-                                               initial_price, initial_price, initial_volume,
-                                               initial_volume, description, tags),
-            OrderConstant.STATUS_PARTIAL_FILLED: Order(identifier, currency_pair, direction, status,
-                                                       timestamp, initial_price,
-                                                       round(initial_price * percent, 5),
-                                                       initial_volume, round(initial_volume * percent, 8),
-                                                       description, tags)
+            STATUS_REJECT: Order(identifier, currency_pair, direction, status, timestamp,
+                                 initial_price, 0., initial_volume, 0., description, tags),
+            STATUS_FILLED: Order(identifier, currency_pair, direction, status, timestamp,
+                                 initial_price, initial_price, initial_volume,
+                                 initial_volume, description, tags),
+            STATUS_PARTIAL_FILLED: Order(identifier, currency_pair, direction, status,
+                                         timestamp, initial_price,
+                                         round(initial_price * percent, 5),
+                                         initial_volume, round(initial_volume * percent, 8),
+                                         description, tags)
         }
 
         yield final_order[status]

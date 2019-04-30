@@ -1,7 +1,6 @@
 import pika
 import pika.channel
-import service.rmq.connection.connection as rmq
-import util.logger.logger as logger
+from service.rmq import service as rmq
 import pika.exceptions
 
 

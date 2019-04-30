@@ -23,6 +23,15 @@ class Reporter:
         return wrapper
 
     @classmethod
+    def update_insertion(cls, func):
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            cls._statistics[func.__name__] += result
+            return result
+
+        return wrapper
+
+    @classmethod
     def report(cls):
         LOGGER.info("""
 =================================================

@@ -1,10 +1,10 @@
 from generator.generator import OrderGenerator
-from config.constant.module import ModuleName
+from service.mysql.service import MySQLService
+from config.constant.module import MAIN
 from service.file.json import JsonFileService
 from util.reporter.reporter import Reporter
 from generator.builder import OrderBuilder
 from config.config import ProjectConfig
-from service.my_sql.service import MySQLService
 import logging.config
 import argparse
 import logging
@@ -12,7 +12,7 @@ import logging.handlers
 import subprocess
 
 
-LOGGER = logging.getLogger(ModuleName.MAIN)
+LOGGER = logging.getLogger(MAIN)
 
 
 class Launcher:
@@ -34,7 +34,6 @@ class Launcher:
         file_separator = "/" if "/" in subprocess.check_output("pwd", universal_newlines=True) else "\\"
 
         logging.config.dictConfig(JsonFileService.read(f"config{file_separator}logger.json"))
-        print("TEST")
         if args.log_level:
             LOGGER.setLevel(logging.getLevelName(args.log_level * 10))
         LOGGER.info("Logging successfully configured")
@@ -43,8 +42,10 @@ class Launcher:
         config = ProjectConfig(**JsonFileService.read("config.json"))
         builder = OrderBuilder(**JsonFileService.read(f"config{file_separator}builder.json"))
         generator = OrderGenerator(builder=builder, **config.Generator)
-        mysql = MySQLService()
-        mysql.open(**config.MySQL)
+        my_sql = MySQLService()
+        my_sql.open(**config.MySQL)
+        order = generator.generate()
+        my_sql
         """
         config = mapper.ConfigMapper(**file.JsonFileService.read("config.json"))
         logger.Logger(config.Logger)

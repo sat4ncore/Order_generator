@@ -1,5 +1,7 @@
+from config.constant.exit_code import ExitCode
 from config.constant.module import ModuleName
-from util.reporter import Reporter
+from util.reporter.reporter import Reporter
+from generator.builder import OrderBuilder
 import logging
 import random
 
@@ -10,11 +12,19 @@ class OrderGenerator:
     def __init__(self, volume, chunk_size, red_zone, green_zone, blue_zone, builder):
         LOGGER.info("Generator configuration...")
         self._volume = volume
+        if not isinstance(builder, OrderBuilder):
+            LOGGER.error("Expected instance builder")
+            exit(ExitCode.GENERATOR)
+        self._builder = builder
+        if chunk_size > volume:
+            LOGGER.warning("Incorrect chunk size specified")
         self._chunk_size = chunk_size
+        if red_zone + green_zone + blue_zone != 100:
+            LOGGER.error("The sum of the zones must be equal to 100")
+            exit(ExitCode.GENERATOR)
         self._red_zone = self._calculate_zone(red_zone)
         self._green_zone = self._calculate_zone(green_zone)
         self._blue_zone = self._calculate_zone(blue_zone)
-        self._builder = builder
 
     def _calculate_zone(self, zone):
         return zone * self._volume // 100

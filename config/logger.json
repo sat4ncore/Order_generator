@@ -9,11 +9,11 @@
       "consoleHandler": {
         "class": "logging.StreamHandler",
         "formatter": "consoleFormatter",
-        "level": "DEBUG"
+        "level": "INFO"
       }
     },
     "loggers": {
-      "program": {
+      "Order_generator": {
         "handlers": [
           "consoleHandler", "fileHandler"
         ],

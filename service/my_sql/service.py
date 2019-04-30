@@ -1,14 +1,34 @@
+from config.constant.exit_code import ExitCode
+from config.constant.module import ModuleName
 import mysql.connector
-import util.logger.logger as logger
-import util.reporter.reporter as report
-import config.constant.exit_code as code
+import logging
+
+LOGGER = logging.getLogger(ModuleName.MYSQL_SERVICE)
 
 
+class MySQLService:
+    def __init__(self):
+        self._connection = None
+
+    def _open(self, host, port, user, password, database, pool_name, pool_size):
+        self._connection = mysql.connector.connect(pool_name, pool_size, host=host, port=port,
+                                                   user=user, password=password, database=database)
+
+    def open(self, user, password, database, host="localhost", port=3306, pool_name=None, pool_size=None):
+        try:
+            LOGGER.info("Attempting to open connection with MySQL")
+            self._open(host, port, user, password, database, pool_name, pool_size)
+        except mysql.connector.ProgrammingError as ex:
+            LOGGER.fatal(ex)
+            exit(ExitCode.MYSQL)
+
+
+"""
 class MySqlService:
     def __init__(self):
         self._connection: mysql.connector.MySQLConnection = None
 
-    @report.Reporter.increment_saved
+
     def _execute(self, cursor, query, params):
         logger.Logger.debug('Executing query: {}'.format(query % params))
         cursor.execute(query, params)
@@ -58,3 +78,4 @@ class MySqlService:
             self._connection = mysql.connector.connect(user=user, password=password, host=host, port=port, database=database)
         except mysql.connector.errors.Error as e:
             logger.Logger.fatal(e, code.ExitCode.MYSQL)
+"""

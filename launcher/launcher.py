@@ -1,15 +1,50 @@
+from generator.generator import OrderGenerator
+from config.constant.module import ModuleName
+from service.file.json import JsonFileService
+from util.reporter.reporter import Reporter
+from generator.builder import OrderBuilder
+from config.config import ProjectConfig
+from service.my_sql.service import MySQLService
+import logging.config
 import argparse
+import logging
+import logging.handlers
+import subprocess
+
+
+LOGGER = logging.getLogger(ModuleName.MAIN)
 
 
 class Launcher:
     @classmethod
     def launch(cls):
         pass
-        #generator, publisher, consumer, mysql_service = cls._initialize()
+        cls._initialize()
         #cls._execute(generator, publisher, consumer, mysql_service)
 
     @classmethod
     def _initialize(cls):
+        arg_parser = argparse.ArgumentParser("Order_generator",
+                                             description="The program that generates the change history of orders")
+        arg_parser.add_argument("-L", "--log", type=int, dest="log_level", help="1 - DEBUG, 2 - INFO, 3 - WARNING"
+                                                                                ", 4 - ERROR, 5 - FATAL")
+        arg_parser.add_argument("-V", "--volume", dest="volume", help="Amount of orders to generate")
+        args = arg_parser.parse_args()
+
+        file_separator = "/" if "/" in subprocess.check_output("pwd", universal_newlines=True) else "\\"
+
+        logging.config.dictConfig(JsonFileService.read(f"config{file_separator}logger.json"))
+        print("TEST")
+        if args.log_level:
+            LOGGER.setLevel(logging.getLevelName(args.log_level * 10))
+        LOGGER.info("Logging successfully configured")
+        LOGGER.info("Configure the remaining modules of the program...")
+
+        config = ProjectConfig(**JsonFileService.read("config.json"))
+        builder = OrderBuilder(**JsonFileService.read(f"config{file_separator}builder.json"))
+        generator = OrderGenerator(builder=builder, **config.Generator)
+        mysql = MySQLService()
+        mysql.open(**config.MySQL)
         """
         config = mapper.ConfigMapper(**file.JsonFileService.read("config.json"))
         logger.Logger(config.Logger)
@@ -31,6 +66,7 @@ class Launcher:
         mysql_service.execute(text.TextFileService.read('schema.sql'))
         logger.Logger.info("Program configuration complete")
         return generator, publisher, consumer, mysql_service
+
 
     @classmethod
     def _execute(cls, generator, publisher, consumer, mysql_service):

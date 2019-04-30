@@ -1,24 +1,16 @@
-class _RabbitMQModule:
-    MAIN = "RabbitMQ"
-    _SUB_FORMAT = f"{MAIN}.%s"
-    CONNECTION = _SUB_FORMAT % "Connection"
-    CONSUMER = _SUB_FORMAT % "Consumer"
-    PUBLISHER = _SUB_FORMAT % "Publisher"
-    SERVICE = _SUB_FORMAT % "Service"
-
-
-class _MySQLModule:
-    MAIN = "MySQL"
-    _SUB_FORMAT = f"{MAIN}.%s"
-    CONNECTION = _SUB_FORMAT % "Connection"
-    SERVICE = _SUB_FORMAT % "Service"
-
-
 class ModuleName:
     MAIN = "Order_generator"
-    _SUB_FORMAT = f"{MAIN}.%s"
-    BUILDER = _SUB_FORMAT % "Builder"
-    GENERATOR = _SUB_FORMAT % "Generator"
-    REPORTER = _SUB_FORMAT % "Reporter"
-    RMQ = _RabbitMQModule
-    MYSQL = _MySQLModule
+    _MAIN_SUB_FORMAT = f"{MAIN}.%s"
+    BUILDER = _MAIN_SUB_FORMAT % "Builder"
+    GENERATOR = _MAIN_SUB_FORMAT % "Generator"
+    REPORTER = _MAIN_SUB_FORMAT % "Reporter"
+    MYSQL = "MySQL"
+    _MYSQL_SUB_FORMAT = f"{MAIN}.{MYSQL}.%s"
+    MYSQL_CONNECTION = _MYSQL_SUB_FORMAT % "Connection"
+    MYSQL_SERVICE = _MYSQL_SUB_FORMAT % "Service"
+    RMQ = "RabbitMQ"
+    _RMQ_SUB_FORMAT = f"{MAIN}.{RMQ}.%s"
+    RMQ_CONNECTION = _RMQ_SUB_FORMAT % "Connection"
+    RMQ_CONSUMER = _RMQ_SUB_FORMAT % "Consumer"
+    RMQ_PUBLISHER = _RMQ_SUB_FORMAT % "Publisher"
+    RMQ_SERVICE = _RMQ_SUB_FORMAT % "Service"

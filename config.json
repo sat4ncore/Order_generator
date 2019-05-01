@@ -1,14 +1,14 @@
 {
   "MySQL": {
-    "host": "172.17.0.2",
+    "host": "mysql",
     "port": 3306,
     "user": "root",
-    "password": "15012000",
+    "password": "root",
     "database": "simcord",
     "pool_size": 3
   },
   "RabbitMQ": {
-    "host": "172.17.0.3",
+    "host": "rabbitmq",
     "port": 5672,
     "virtual_host": "/",
     "user": "guest",
@@ -21,7 +21,7 @@
     "exchange_type": "topic"
   },
   "Generator": {
-    "volume": 5000,
+    "volume": 2000,
     "chunk_size": 250,
     "red_zone": 15,
     "green_zone": 60,

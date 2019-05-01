@@ -11,21 +11,21 @@ Order generator is a program that generates input data for some financial proces
 
 ### Order structure
 
-| Attribute         | Description                                                                       |
-| --------------    | --------------------------------------------------------------------------------- |
-| Identifier        | Unique order identifier                                                           |
-| Currency pair     | The pair that interests the trader                                                |
-| Direction         | Selected operation. Can be **buy** or **sell**                                    |
-| Status            | The status of the order at the specified time                                     |
-| Date              | Date in which the order was in a certain status                                   |
-| Initial price     | Starting price of a currency pair                                                 |
-| Filled price      | Price of the currency pair at the end of the order.                               |
-|                   | May differ from the initial price by +/- 5%                                       |
-| Initial volume    | Amount of currency that interests the trader                                      |
-| Filled volume     | Amount of currency that the trader                                                |
-|                   | has received at the end of the order.                                             |
-| Description       | A note left by the trader when creating an order                                  |
-| Tags              | A few single words regarding the order                                            |
+| Attribute         | Description                                           |
+| --------------    | ----------------------------------------------------- |
+| Identifier        | Unique order identifier                               |
+| Currency pair     | The pair that interests the trader                    |
+| Direction         | Selected operation. Can be **buy** or **sell**        |
+| Status            | The status of the order at the specified time         |
+| Date              | Date in which the order was in a certain status       |
+| Initial price     | Starting price of a currency pair                     |
+| Filled price      | Price of the currency pair at the end of the order.   |
+|                   | May differ from the initial price by +/- 5%           |
+| Initial volume    | Amount of currency that interests the trader          |
+| Filled volume     | Amount of currency that the trader                    |
+|                   | has received at the end of the order.                 |
+| Description       | A note left by the trader when creating an order      |
+| Tags              | A few single words regarding the order                |
 
 Each order can fall into one of three zones:
 
@@ -70,6 +70,50 @@ To run the application in normal mode, use the command:
 python3 program.py
 ```
 
+For specific settings for connecting to services, use the config file. 
+Also in this file you can change the generation volume and the percentage of zones.
+
+To quickly set some parameters, use the arguments before running the program. 
+More detailed information:
+
+```bash
+python3 program.py -H 
+```
+
 After starting the application will create a database and tables in it. 
 As well as the exchange point and queue in the message broker. 
 As soon as preparation is completed, the generator will automatically perform the necessary actions.
+
+### Alternative start
+
+This method uses a docker to run an application in a container.
+
+If you want to try this method you need to install the docker 
+according to the instructions from the official [Docker](docker.com) site for your system.
+
+You will also need docker-compose if you do not know how to manually start containers with the necessary services.
+
+Use the following commands to run an application in a container:
+
+```bash
+docker-compose up
+docker build -t generator .
+docker run -i --network generator_default --name=generator generator
+```
+
+These commands are already described in the script `docker.sh`. 
+Instead of the commands above, just enter:
+
+```bash
+./docker.sh
+```
+
+After these actions, the application will start in the container. 
+In case of failure, please check the settings file, after re-build the application:
+
+```bash
+docker-compose down
+docker rm generator
+docker rmi generator
+```
+

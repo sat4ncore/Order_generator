@@ -58,7 +58,6 @@ class Launcher:
         generator = OrderGenerator(builder=builder, **config.Generator)
         my_sql = MySQLService()
         my_sql.open(**config.MySQL)
-        my_sql.execute(TextFileService.read_all("schema.sql"))
         LOGGER.info("Database schema created")
         exchange_config = ExchangeConfig(**config.Exchange)
         rmq_service = RMQService()

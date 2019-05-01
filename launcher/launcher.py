@@ -12,6 +12,7 @@ from service.rmq.consumer import RMQConsumer
 from service.rmq.publisher import RMQPublisher
 from util.collector.collector import OrderCollector
 from config.exchange_config import ExchangeConfig
+from service.file.text import TextFileService
 import logging.config
 import argparse
 import logging
@@ -57,6 +58,8 @@ class Launcher:
         generator = OrderGenerator(builder=builder, **config.Generator)
         my_sql = MySQLService()
         my_sql.open(**config.MySQL)
+        my_sql.execute(TextFileService.read_all("schema.sql"))
+        LOGGER.info("Database schema created")
         exchange_config = ExchangeConfig(**config.Exchange)
         rmq_service = RMQService()
         rmq_service.open(**config.RabbitMQ)
@@ -113,3 +116,4 @@ class Launcher:
         collector.stop()
         consumer_start.stop()
         consumer_final.stop()
+

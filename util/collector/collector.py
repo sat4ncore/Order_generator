@@ -33,12 +33,13 @@ class OrderCollector(threading.Thread):
 
     def run(self):
         while not self._stop_event:
-            time.sleep(5)
+            time.sleep(3)
+            self._lock.acquire()
             if len(self._collection) > 0:
-                LOGGER.info("Batch ready to execute")
-                self._lock.acquire()
+                LOGGER.debug("Batch ready to execute")
                 self._my_sql.execute_many(INSERT_ORDER, self._collection)
                 self._collection.clear()
-                self._lock.release()
-                LOGGER.info("Batch successfully executed")
+                LOGGER.debug("Batch successfully executed")
+            self._lock.release()
+        self._my_sql.close()
 

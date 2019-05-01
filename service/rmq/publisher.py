@@ -1,9 +1,11 @@
 from config.constant.module import RabbitMQModule
+from util.reporter.reporter import Reporter
 import pika
 import pika.channel
 import pika.exceptions
 import logging
 import time
+
 
 LOGGER = logging.getLogger(RabbitMQModule.PUBLISHER)
 
@@ -24,6 +26,7 @@ class RMQPublisher:
     def _publish(self, routing_key, body, properties, mandatory):
         self._channel.basic_publish(self._exchange, routing_key, body, properties, mandatory)
 
+    @Reporter.update_time
     def publish(self, routing_key, body, properties=pika.BasicProperties(delivery_mode=2), mandatory=False):
         try:
             self._publish(routing_key, body, properties, mandatory)

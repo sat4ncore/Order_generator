@@ -4,3 +4,5 @@ class ReportConstant:
     BLUE_ZONE = "_generate_blue_zone"
     FROM_RABBIT_MQ = "_consume_callback"
     INTO_MYSQL = "_execute_many"
+    GENERATING = "generate"
+    PUBLISHING = "publish"

@@ -25,16 +25,16 @@ class RMQConsumer(threading.Thread):
         channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         return body
 
-    def _consume(self, queue, exclusive, consumer_tag):
+    def _consume(self, queue, auto_ack, exclusive, consumer_tag):
         if not self._connection:
             self._connect()
         if queue not in self._queues:
             self._queues.append(queue)
-        self._channel.basic_consume(queue, self._consume_callback, exclusive, consumer_tag)
+        self._channel.basic_consume(queue, self._consume_callback, auto_ack, exclusive, consumer_tag)
 
-    def consume(self, queue, exclusive=False, consumer_tag=None):
+    def consume(self, queue, auto_ack=False, exclusive=False, consumer_tag=None):
         try:
-            self._consume(queue, exclusive, consumer_tag)
+            self._consume(queue, auto_ack,  exclusive, consumer_tag)
         except pika.exceptions.AMQPChannelError as ex:
             LOGGER.error(ex)
 
@@ -43,6 +43,7 @@ class RMQConsumer(threading.Thread):
             self._connection = pika.BlockingConnection(self._parameters)
             self._channel = self._connection.channel()
             self._channel.basic_qos(prefetch_count=1)
+            self._channel.confirm_delivery()
             LOGGER.info("Connection to RabbitMQ successfully established")
         except pika.exceptions.AMQPConnectionError:
             LOGGER.fatal("Incorrect connection parameters or time out")

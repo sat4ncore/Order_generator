@@ -21,8 +21,8 @@
     "exchange_type": "topic"
   },
   "Generator": {
-    "volume": 10000,
-    "chunk_size": 2000,
+    "volume": 5000,
+    "chunk_size": 250,
     "red_zone": 15,
     "green_zone": 60,
     "blue_zone": 25

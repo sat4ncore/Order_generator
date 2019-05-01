@@ -24,7 +24,6 @@ class MySQLService:
                 LOGGER.info(f"Connection pool definition with size {kwargs['pool_size']}")
             self._open(host, port, user, password, database, **kwargs)
             LOGGER.info("Connection established successfully")
-            return True
         except (mysql.connector.DatabaseError, mysql.connector.InterfaceError) as ex:
             LOGGER.fatal(ex)
             exit(MYSQL)
@@ -35,18 +34,17 @@ class MySQLService:
     def close(self):
         if self._is_connected():
             self._close()
-            return True
-        else:
-            return False
+        LOGGER.info("Connection closed")
 
     def _reconnect(self):
         try:
-            LOGGER.info(f"Reconnect to MySQL out of {self._attempts} attempts and delay {self._delay}...")
-            self._connection.reconnect(self._attempts, self._delay)
-            return True
+            if not self._is_connected():
+                LOGGER.info(f"Reconnect to MySQL out of {self._attempts} attempts and delay {self._delay}...")
+                self._connection.reconnect(self._attempts, self._delay)
+            LOGGER.info("Connection established successfully")
         except mysql.connector.InterfaceError as ex:
             LOGGER.error(ex)
-            return False
+            exit(MYSQL)
 
     def _execute(self, operation, params, multi):
         cursor = self._connection.cursor()
@@ -63,16 +61,14 @@ class MySQLService:
 
     def execute(self, operation, params=(), multi=False):
         try:
-            if self._is_connected():
-                LOGGER.debug(f"Execute with {operation} operation, {params} params and {multi} multi")
-                return self._execute(operation, params, multi)
+            LOGGER.debug(f"Execute with {operation} operation, {params} params and {multi} multi")
+            return self._execute(operation, params, multi)
         except mysql.connector.ProgrammingError as ex:
             LOGGER.error(ex)
-            if self._reconnect():
-                return self._execute(operation, params, multi)
-            else:
-                exit(MYSQL)
+            self._reconnect()
+            return self._execute(operation, params, multi)
 
+    @Reporter.update_time
     @Reporter.update_insertion
     def _execute_many(self, operation, seq_params):
         cursor = self._connection.cursor()
@@ -87,5 +83,5 @@ class MySQLService:
         except mysql.connector.OperationalError as ex:
             LOGGER.error(ex)
             self._reconnect()
-            self._connection.rollback()
             return self._execute_many(operation, seq_params)
+

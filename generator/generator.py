@@ -55,6 +55,7 @@ class OrderGenerator:
             orders.append(next(build))
         return orders
 
+    @Reporter.update_time
     def generate(self) -> list:
         order_record = None
         if self._red_zone > 0:

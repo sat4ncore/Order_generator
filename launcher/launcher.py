@@ -1,26 +1,34 @@
+from util.serializer.protobuf.serializer import ProtobufSerializer
+from config.constant.order import Status
 from generator.generator import OrderGenerator
 from service.mysql.service import MySQLService
 from config.constant.module import MAIN
 from service.file.json import JsonFileService
 from util.reporter.reporter import Reporter
 from generator.builder import OrderBuilder
+from service.rmq.service import RMQService
 from config.config import ProjectConfig
+from service.rmq.consumer import RMQConsumer
+from service.rmq.publisher import RMQPublisher
+from util.collector.collector import OrderCollector
+from config.exchange_config import ExchangeConfig
 import logging.config
 import argparse
 import logging
 import logging.handlers
 import subprocess
-
+import time
+import threading
 
 LOGGER = logging.getLogger(MAIN)
+getchar = None
 
 
 class Launcher:
     @classmethod
     def launch(cls):
-        pass
-        cls._initialize()
-        #cls._execute(generator, publisher, consumer, mysql_service)
+        generator, publisher, consumer_start, consumer_final, collector = cls._initialize()
+        cls._execute(generator, publisher, consumer_start, consumer_final, collector)
 
     @classmethod
     def _initialize(cls):
@@ -28,7 +36,8 @@ class Launcher:
                                              description="The program that generates the change history of orders")
         arg_parser.add_argument("-L", "--log", type=int, dest="log_level", help="1 - DEBUG, 2 - INFO, 3 - WARNING"
                                                                                 ", 4 - ERROR, 5 - FATAL")
-        arg_parser.add_argument("-V", "--volume", dest="volume", help="Amount of orders to generate")
+        arg_parser.add_argument("-V", "--volume", type=int, dest="volume", help="Amount of orders to generate")
+        arg_parser.add_argument("-C", "--chunk", type=int, dest="chunk_size", help="Chunk size for batch")
         args = arg_parser.parse_args()
 
         file_separator = "/" if "/" in subprocess.check_output("pwd", universal_newlines=True) else "\\"
@@ -41,66 +50,66 @@ class Launcher:
 
         config = ProjectConfig(**JsonFileService.read("config.json"))
         builder = OrderBuilder(**JsonFileService.read(f"config{file_separator}builder.json"))
+        if args.volume:
+            config.Generator["volume"] = args.volume
+        if args.chunk_size:
+            config.Generator["chunk_size"] = args.chunk_size
         generator = OrderGenerator(builder=builder, **config.Generator)
         my_sql = MySQLService()
         my_sql.open(**config.MySQL)
-        order = generator.generate()
-        my_sql
-        """
-        config = mapper.ConfigMapper(**file.JsonFileService.read("config.json"))
-        logger.Logger(config.Logger)
-        logger.Logger.info(f"Configuration loaded from file {'config.json'}")
-        logger.Logger.info("Program configuration...")
-        generator = gen.OrderGenerator(**config.Generator)
-        rmq_connection = rmq.RMQConnection()
-        rmq_connection.open(**config.RabbitMQ)
-        rmq_service = rmqs.RMQService(rmq_connection)
-        rmq_service.exchange_declare(**config.Publisher)
-        publisher_config = rmqm.RabbitMQPublisherMapper(**config.Publisher)
-        for status in genc.GeneratorConsts.STATUSES:
-            rmq_service.queue_declare(status)
-            rmq_service.queue_bind(status, publisher_config.exchange)
-        publisher = rmqp.RMQPublisher(rmq_connection, **config.Publisher)
-        consumer = rmqc.RMQConsumer(rmq_connection)
-        mysql_service = mysqls.MySqlService()
-        mysql_service.open(**config.MySQL)
-        mysql_service.execute(text.TextFileService.read('schema.sql'))
-        logger.Logger.info("Program configuration complete")
-        return generator, publisher, consumer, mysql_service
+        exchange_config = ExchangeConfig(**config.Exchange)
+        rmq_service = RMQService()
+        rmq_service.open(**config.RabbitMQ)
+        publisher = RMQPublisher(rmq_service.parameters, exchange_config.exchange)
+        consumer_final = RMQConsumer(rmq_service.parameters)
+        consumer_start = RMQConsumer(rmq_service.parameters)
 
+        rmq_service.exchange_declare(**config.Exchange, durable=True)
+        for status in Status.ALL:
+            rmq_service.queue_declare(status, durable=True)
+            rmq_service.queue_bind(status, exchange_config.exchange)
+            if status in Status.FINALS:
+                consumer_final.consume(status)
+            else:
+                consumer_start.consume(status)
+
+        collector = OrderCollector(my_sql)
+        return generator, publisher, consumer_start, consumer_final, collector
 
     @classmethod
-    def _execute(cls, generator, publisher, consumer, mysql_service):
+    def _execute(cls, generator, publisher, consumer_start, consumer_final, collector):
+        consumer_start.start()
+        consumer_final.start()
+        collector.start()
         completed = False
-        report = threading.Thread(target=cls._report)
-        report.start()
-        logger.Logger.info("Run generation and publication to RabbitMQ...")
+        LOGGER.info("Generation and Publishing started...")
+        LOGGER.info("Press the enter key to get the report")
+        threading.Thread(target=cls._report).start()
         while not completed:
-            for order_record in generator.generate_many():
-                if order_record:
-                    for order in order_record:
-                        publisher.publish(order.status, serializer.ProtoSerializer.serialize(order))
+            for order in generator.generate_many():
+                if order:
+                    LOGGER.debug("Chunk generation and publication...")
+                    for record in order:
+                        publisher.publish(record.status, ProtobufSerializer.serialize(record))
                 else:
-                    logger.Logger.info("Generation complete")
                     completed = True
+                    LOGGER.info("Generation complete")
                     break
-        logger.Logger.info("You can get a report by pressing the enter key.")
-        consumer.start_consuming()
-        store.Storage.prepare_queries()
-        logger.Logger.info("Insert orders to database...")
-        mysql_service.execute(mysqlc.MySQLConstant.INSERT, store.Storage.storage, True)
-        logger.Logger.info("Insert succesfull")
+        threading.Thread(target=cls._free, args=(collector, consumer_start, consumer_final)).start()
 
     @classmethod
     def _report(cls):
-        try:
-            while True:
-                if input().encode() == b"":
-                    reporter.Reporter.report()
-        except KeyboardInterrupt:
-            logger.Logger.info("Stop reporting")
+        global getchar
+        while getchar != "exit":
+            getchar = input()
+            Reporter.report()
+        LOGGER.info("Stop report")
 
     @classmethod
-    def _free(cls):
-        pass
-        """
+    def _free(cls, collector, consumer_start, consumer_final):
+        while getchar != "exit":
+            time.sleep(5)
+        LOGGER.info("Free all")
+        collector.stop()
+        consumer_start.stop()
+        consumer_final.stop()

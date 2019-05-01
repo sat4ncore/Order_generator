@@ -41,8 +41,9 @@ class OrderGenerator:
     @Reporter.update_statistics
     def _generate_green_zone(self):
         orders = []
-        for record in self._builder.build():
-            orders.append(next(record))
+        build = self._builder.build()
+        for _ in range(3):
+            orders.append(next(build))
         return orders
 
     @Reporter.update_statistics

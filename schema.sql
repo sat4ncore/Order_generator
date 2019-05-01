@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS history (
   filled_volume decimal(20,8) NOT NULL,
   description text NOT NULL,
   tags varchar(255) NOT NULL,
-  PRIMARY KEY (identifier,status)
+  PRIMARY KEY (identifier, status)
 );

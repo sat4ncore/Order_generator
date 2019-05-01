@@ -21,12 +21,11 @@ class MySQLService:
         try:
             LOGGER.info("Attempting to open connection with MySQL...")
             if kwargs:
-                LOGGER.info(f"Connection pool definition with name {kwargs['pool_name']}"
-                            f" and size {kwargs['pool_size']}")
+                LOGGER.info(f"Connection pool definition with size {kwargs['pool_size']}")
             self._open(host, port, user, password, database, **kwargs)
             LOGGER.info("Connection established successfully")
             return True
-        except mysql.connector.DatabaseError as ex:
+        except (mysql.connector.DatabaseError, mysql.connector.InterfaceError) as ex:
             LOGGER.fatal(ex)
             exit(MYSQL)
 
@@ -83,12 +82,10 @@ class MySQLService:
 
     def execute_many(self, operation, seq_params):
         try:
-            if self._is_connected():
-                LOGGER.debug(f"Execute many with {operation} operation")
-                return self._execute_many(operation, seq_params)
-        except mysql.connector.ProgrammingError as ex:
+            LOGGER.debug(f"Execute many with {operation} operation")
+            return self._execute_many(operation, seq_params)
+        except mysql.connector.OperationalError as ex:
             LOGGER.error(ex)
-            if self._reconnect():
-                return self._execute_many(operation, seq_params)
-            else:
-                exit(MYSQL)
+            self._reconnect()
+            self._connection.rollback()
+            return self._execute_many(operation, seq_params)

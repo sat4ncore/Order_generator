@@ -1,28 +1,28 @@
 {
   "MySQL": {
-    "host": "172.17.0.4",
+    "host": "172.17.0.2",
     "port": 3306,
     "user": "root",
     "password": "15012000",
     "database": "simcord",
-    "pool_name": "pool",
     "pool_size": 3
   },
   "RabbitMQ": {
-    "host": "localhost",
+    "host": "172.17.0.3",
     "port": 5672,
     "virtual_host": "/",
     "user": "guest",
     "password": "guest",
-    "connection_attempts": 30
+    "connection_attempts": 15,
+    "retry_delay": 1
   },
-  "Publisher": {
+  "Exchange": {
     "exchange": "order",
     "exchange_type": "topic"
   },
   "Generator": {
     "volume": 10000,
-    "chunk_size": 100,
+    "chunk_size": 2000,
     "red_zone": 15,
     "green_zone": 60,
     "blue_zone": 25

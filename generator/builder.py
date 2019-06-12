@@ -57,17 +57,17 @@ class OrderBuilder:
 
         status = random.choice(Status.FINALS)
 
-        percent = random.uniform(0.95, 1.05)
+        filled_price = round(initial_price * random.uniform(0.95, 1.05), 5)
         final_order = {
             Status.REJECT: Order(identifier, currency_pair, direction, status, timestamp,
                                  initial_price, 0., initial_volume, 0., description, tags),
             Status.FILLED: Order(identifier, currency_pair, direction, status, timestamp,
                                  initial_price, initial_price, initial_volume,
-                                 initial_volume, description, tags),
+                                 initial_volume / initial_price, description, tags),
             Status.PARTIAL_FILLED: Order(identifier, currency_pair, direction, status,
                                          timestamp, initial_price,
-                                         round(initial_price * percent, 5),
-                                         initial_volume, round(initial_volume * percent, 8),
+                                         filled_price,
+                                         initial_volume, initial_volume / filled_price,
                                          description, tags)
         }
 
